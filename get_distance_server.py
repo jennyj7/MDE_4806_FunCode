@@ -9,14 +9,17 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind((HOST,PORT))
 s.listen(5)
 
-print("Waiting for connection...")
+#update command line to show it is waiting for a connection
+print("Waiting for a connection")
 
 #accept connection
 connection, address = s.accept()
 
-print("Connection accepted")
-
 while True:
+    
+    #update commannd line
+    print("Connection accepted")
+    
     #recieve data from client
     data = connection.recv(1024).decode()
     
@@ -36,7 +39,7 @@ while True:
         import picamera
 
         #name jpg
-        readImage = 'blackDot.jpg'
+        #readImage = 'blackDot.jpg'
 
         #tell pi to take a picture with the camera
         #cam = picamera.PiCamera()
@@ -144,65 +147,16 @@ while True:
             #Show the image in a new window
             plt.imshow(image, cmap = 'gray', interpolation = 'bicubic')
             plt.xticks([]), plt.yticks([])
-            plt.show()
-        """
-        #Show the image in a new window
-        plt.imshow(image, cmap = 'gray', interpolation = 'bicubic')
-        plt.xticks([]), plt.yticks([])
-        plt.show()
-
-
-        gray = cv2.imread(readImage,0)
-        th, threshed = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY_INV|cv2.THRESH_OTSU)
-        cnts = cv2.findContours(threshed, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[-2]
-        s1 = 3
-        s2 = 20
-        xcnts = []
-        for cnt in cnts:
-            if s1<cv2.contourArea(cnt)<s2:
-                xcnts.append(cnt)
-                
-        print("\nDots Number: {}".format(len(xcnts)))
-
-        #load the image, clone it for output, and then convert it to grayscale
-        image = cv2.imread(readImage)
-        imgae = cv2.medianBlur(image,5)
-        output = image.copy()
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
-        #detect circles in the image
-        #circles = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, 1.2, 50)
-        circles =cv2.HoughCircles(gray,cv2.HOUGH_GRADIENT,1,60,param1=50,param2=30,minRadius=0,maxRadius=0)
-
-        #ensure at least some circles were found
-        if circles is not None:
-
-            print("Circle(s) found")
             
-            #convert (x, y) coordinates and radius of the circles to integers
-            circles = np.round(circles[0, :]).astype("int")
-            #circles = np.uint16(np.around(circles))
-            #convert the (x, y) coordinates and radius of the circles
-            for (x, y, r) in circles:
-                
-                #draw the circle in the output image, then draw a rectangle
-                #corresponding to the center of the circle
-                cv2.circle(output, (x, y), r, (0, 255, 0), 4)
-                cv2.rectangle(output, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
-                
-                #show the output image
-                #cv2.namedWindow('Image', cv2.WINDOW_NORMAL)
-                #cv2.imshow("output", np.hstack([image, output]))
-                #cv2.waitKey(0)
-                
-                plt.imshow(output, cmap = 'gray', interpolation = 'bicubic')
-                plt.xticks([]), plt.yticks([])
-                plt.show()
-
-        else:
-            print("No Circle Found")
+            #Send data back to first raspberry pi
+            contents = "LED On"
+            connection.send(contents.encode())
             
-            plt.imshow(output, cmap = 'gray', interpolation = 'bicubic')
-            plt.xticks([]), plt.yticks([])
-            plt.show()
-        """
+            #update command line
+            print("Sent Information Back to Client")
+            print("Waiting for a new connection")
+            
+            
+            
+
+
