@@ -22,14 +22,6 @@ command = sys.argv[2]
 port = int(command)
 socket_size = sys.argv[3]
 
-
-contents = "start"
-print("started")
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-sock.connect((host, port))
-print("connected")
-sock.send(contents.encode())
-
 # print("Output High")
 # 
 # GPIO.output(23, GPIO.HIGH)
@@ -74,17 +66,17 @@ connection, address = s.accept()
 
 print("Connection accepted")
 
-while True:
-    #recieve data from client
-    data = connection.recv(1024).decode()
-    
-    #read data
-    command = data.encode()
-    
-    print("Read data: ", command.decode())
-    
-    #check what the command is
-    if command.decode() == "start":
-        GPIO.output(25, True)
-        time.sleep(10)
-        GPIO.output(25, False)
+#recieve data from client
+data = connection.recv(1024).decode()
+
+#read data
+command = data.encode()
+
+print("Read data: ", command.decode())
+
+#check what the command is
+if command.decode() == "LED On":
+    GPIO.output(25, True)
+    time.sleep(10)
+    GPIO.output(25, False)
+
