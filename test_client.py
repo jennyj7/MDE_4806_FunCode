@@ -3,10 +3,9 @@ import sys
 
 
 #pull host, port, and socket information from command prompt
-host = sys.argv[1]
-command = sys.argv[2]
-port = int(command)
-socket_size = sys.argv[3]
+host = '127.0.0.1'
+port = 9990
+socket_size = 1024
 
 
 contents = "start"

@@ -5,78 +5,60 @@ sendPic = False
 #import libraries
 import RPi.GPIO as GPIO
 import time
-
+import socket
+import sys
 #GPIO Basic initialization
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
 #Use a variable for the Pin to use
 #If you followed my pictures, it's port 7 => BCM 4
-GPIO.setup(23, GPIO.OUT)
-GPIO.setup(24, GPIO.IN)
-GPIO.setup(25, GPIO.OUT)
+GPIO.setup(24, GPIO.IN)#button
+GPIO.setup(23, GPIO.OUT)#LED
 
 #socket initialization
-host = sys.argv[1]
-command = sys.argv[2]
+host = '127.0.0.1'
+command = 9997
 port = int(command)
-socket_size = sys.argv[3]
+socket_size = 1024
 
-# print("Output High")
-# 
-# GPIO.output(23, GPIO.HIGH)
-# #Wait 5s
-# time.sleep(5)
-# GPIO.output(23,GPIO.LOW)
+#update command line
+print("[Client 01] Waiting for Button to be Pressed")
 
-# print("Output Low")
+while True:
 
-GPIO.input(24)
+        #wait for button press
+        while GPIO.input(24) == 1:
+                time.sleep(0.7)
 
-boolCheck=True
-
-while boolCheck:
-    if GPIO.input(24) == 0:
-        print("button pressed")
-        
-        contents = "start"
-        print("started")
+        #update the command line
+        print("[Client 02] Button Pressed")
+                  
+        #connect to server
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((host, port))
-        print("connected")
+        print("[Client 03] Connected to Server")
+                
+        #send start packet
+        contents = "start"
         sock.send(contents.encode())
-        boolCheck = False
+        print("[Client 04] Sending to Server:", contents)
 
+        #recieve from the server
+        recieved = sock.recv(1024)
+        recieved = recieved.decode()
+        print("[Client 05] Recieved from Server:", recieved)
 
-import socket
-
-#Set host and port
-HOST = '10.0.0.231'
-PORT = 10003
-
-#Create Socket
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind((HOST,PORT))
-s.listen(5)
-
-print("Waiting for connection...")
-
-#accept connection
-connection, address = s.accept()
-
-print("Connection accepted")
-
-#recieve data from client
-data = connection.recv(1024).decode()
-
-#read data
-command = data.encode()
-
-print("Read data: ", command.decode())
-
-#check what the command is
-if command.decode() == "LED On":
-    GPIO.output(25, True)
-    time.sleep(10)
-    GPIO.output(25, False)
-
+        #close the connection
+        sock.close()
+                
+        #check what the command is
+        if recieved == "LED On":
+                print("[Client 06] Turn On LED")
+                GPIO.output(23, GPIO.HIGH)
+                time.sleep(1)
+                GPIO.output(23, GPIO.LOW)
+                
+        #update command line
+        print("--------------------------------------------")
+        print("[Client 01] Waiting for Button to be Pressed")

@@ -1,0 +1,66 @@
+import socket
+
+ghhsignal = True
+picture = False
+sendPic = False
+
+#import libraries
+import RPi.GPIO as GPIO
+import time
+import socket
+import sys
+#GPIO Basic initialization
+GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings(False)
+
+#Use a variable for the Pin to use
+#If you followed my pictures, it's port 7 => BCM 4
+GPIO.setup(23, GPIO.OUT)#led
+GPIO.setup(24, GPIO.IN)#button
+
+#socket initialization
+host = '10.0.0.153'
+command = 9999
+port = int(command)
+socket_size = 1024
+# print("Output High")
+# GPIO.output(23, GPIO.HIGH)
+# #Wait 5s
+# time.sleep(5)
+# GPIO.output(23,GPIO.LOW)
+
+# print("Output Low")
+
+
+boolCheck=True
+
+while boolCheck:
+        #wait for button press
+        while GPIO.input(24) == 1:
+                time.sleep(0.2)
+                print("button pressed")
+                
+                # send start packet
+                contents = "start"
+                print("started")
+                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                sock.connect((host, port))
+                print("connected")
+                sock.send(contents.encode())
+                boolCheck = False
+        
+        #wait for button release
+        while GPIO.input(24) == 0:
+                time.sleep(0.2)
+                
+                
+        recieved = sock.recv(1024)
+        print(recieved.decode)
+        
+        #check what the command is
+        if recieved.decode() == "LED On":
+                print("recieved")
+                GPIO.output(23, GPIO.HIGH)
+                time.sleep(3)
+                GPIO.output(23, GPIO.LOW)
+        

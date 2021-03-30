@@ -1,8 +1,8 @@
 import socket
 
 #Set host and port
-HOST = '10.0.0.231'
-PORT = 10003
+HOST = '127.0.0.1'
+PORT = 9997
 
 #Create Socket
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -10,23 +10,19 @@ s.bind((HOST,PORT))
 s.listen(5)
 
 #update command line to show it is waiting for a connection
-print("Waiting for a connection")
+print("[Server 01] Waiting for a connection")
 
-#accept connection
-connection, address = s.accept()
+while (1):
+    
+    #accept connection
+    connection, address = s.accept()
 
-while True:
+    #recieve data from client
+    command = connection.recv(1024)
     
     #update commannd line
-    print("Connection accepted")
-    
-    #recieve data from client
-    data = connection.recv(1024).decode()
-    
-    #read data
-    command = data.encode()
-    
-    print("Read data: ", command.decode())
+    print("[Server 02] Connection accepted")
+    print("[Server 03] Read data: ", command.decode())
     
     #check what the command is
     if command.decode() == "start":
@@ -39,14 +35,14 @@ while True:
         import picamera
 
         #name jpg
-        #readImage = 'blackDot.jpg'
+        readImage = 'blackDot.jpg'
 
         #tell pi to take a picture with the camera
         #cam = picamera.PiCamera()
         #cam.capture(readImage)
 
         #update command line that picture has been taken
-        print('Picture Taken')
+        print('[Server 04] Picture Taken')
 
         #Code from: https://stackoverflow.com/questions/60486029/how-to-find-the-center-of-black-objects-in-an-image-with-python-opencv
         #Reads jpg and finds circles in the image
@@ -90,7 +86,7 @@ while True:
             while int(M["m00"]) == 0:
                 
                 #update command line
-                print("Retake Number:", retakeCount)
+                print("[Server 05] Retake Number:", retakeCount)
                 
                 #increment counter
                 retakeCount = retakeCount + 1
@@ -129,7 +125,7 @@ while True:
                 
                 
             #update command line
-            print("Dot Found!")
+            print("[Server 07] Dot Found!")
             
             #Find centroid
             cX = int(M["m10"]/M["m00"])
@@ -150,13 +146,9 @@ while True:
             
             #Send data back to first raspberry pi
             contents = "LED On"
-            connection.send(contents.encode())
+            connection.send(contents.encode())       
             
             #update command line
-            print("Sent Information Back to Client")
-            print("Waiting for a new connection")
-            
-            
-            
-
-
+            print("[Server 08] Sent Information Back to Client")
+            print("-------------------------------------------")
+            print("[Server 09] Waiting for a new connection")   
