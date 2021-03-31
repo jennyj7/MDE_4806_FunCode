@@ -49,7 +49,7 @@ while (1):
 
         #import the necessary packages
         import numpy as np
-        import cv2
+pip
 
         #matplotlib shows the image
         from matplotlib import pyplot as plt
@@ -145,7 +145,7 @@ while (1):
             plt.xticks([]), plt.yticks([])
             
             #Send data back to first raspberry pi
-            contents = "LED On"
+            contents = "123 567"
             connection.send(contents.encode())       
             
             #update command line
