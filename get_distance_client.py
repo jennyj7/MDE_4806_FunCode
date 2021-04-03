@@ -20,65 +20,66 @@ GPIO.setup(23, GPIO.OUT)#LED
 
 #socket initialization
 host = '127.0.0.1'
-command = 9997
+command = 9999
 port = int(command)
 socket_size = 1024
 
 #audrino initializatipn
-ser=serial.Serial("/dev/ttyACM0",9600, timeout=1) #change ACM number as found from ls /dev/tty/ACM*
-ser.baudrate = 9600
+#ser=serial.Serial("/dev/ttyACM0",9600, timeout=1) #change ACM number as found from ls /dev/tty/ACM*
+#ser.baudrate = 9600
 
 #update command line
 print("[Client 01] Waiting for Command from Audrino")
 
-while True:
+#while True:
         
-        #Wait read from audrino
-        read_audrino = ser.readline()
-        
-        #Look for "Mesure" command
-        if read_audrino.decode() == 'Measure':
+#Wait read from audrino
+#read_audrino = ser.readline()
 
-            #update the command line
-            print("[Client 02] Message from Audrino:", read_audrino.decode())
-                      
-            #connect to server
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.connect((host, port))
-            print("[Client 03] Connected to Server")
-                    
-            #send start packet
-            contents = "start"
-            sock.send(contents.encode())
-            print("[Client 04] Sending to Server:", contents)
+#Look for "Mesure" command
+if True: #read_aurduino.decode() == 'Measure':
 
-            #recieve from the server
-            recieved = sock.recv(1024)
-            recieved = recieved.decode()
-            print("[Client 05] Recieved from Server:", recieved)
-
-            #close the connection
-            sock.close()
-                    
-            '''
-            #check what the command is
-            if recieved == "LED On":
-                    print("[Client 06] Turn On LED")
-                    GPIO.output(23, GPIO.HIGH)
-                    time.sleep(1)
-                    GPIO.output(23, GPIO.LOW)
-            '''
+    #update the command line
+    #print("[Client 02] Message from Audrino:", read_audrino.decode())
+              
+    #connect to server
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect((host, port))
+    print("[Client 03] Connected to Server")
             
-            x_val = recieved[0:2]
-            y_val = recieved[4:6]
-            
-            send_StringX = str(x_val)
-            send_StringY = str(y_val)
+    #send start packet
+    contents = "start"
+    sock.send(contents.encode())
+    print("[Client 04] Sending to Server:", contents)
 
-            ser.write(send_StringX.encode())
-            time.sleep(1)
-            ser.write(send_StringY.encode())
+    #recieve from the server
+    recieved = sock.recv(1024)
+    recieved = recieved.decode()
+    print("[Client 05] Recieved from Server:", recieved)
+
+    #close the connection
+    sock.close()
+    
+    if recieved == "Realign":
+        #####
+        #####
+        print(recieved)
+    
+    elif recieved == "Aligned":
+        #####
+        #####
+        print(recieved)
+    
+    else:
+        x_val = recieved[0:recieved.find(' ')]
+        y_val = recieved[recieved.find(' ') + 1:len(recieved)]
         
-        #update command line
-        print("--------------------------------------------")
-        print("[Client 01] New Message from Audrino")
+        print("x_val:", x_val)
+        print("y_val:", y_val)
+        
+        send_StringX = str(x_val)
+        send_StringY = str(y_val)
+
+#update command line
+print("--------------------------------------------")
+print("[Client 01] New Message from Audrino")
