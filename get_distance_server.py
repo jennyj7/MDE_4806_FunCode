@@ -11,7 +11,7 @@ import cv2 as cv2
 
 #Set host and port
 HOST = '127.0.0.1'
-PORT = 9999
+PORT = 9998
 
 #Create Socket
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -43,7 +43,7 @@ while (1):
         while True:
 
             #name jpg
-            readImage = 'centeredDot.jpg'
+            readImage = 'blackDot.jpg'
 
             #tell pi to take a picture with the camera
             #cam.capture(readImage)
@@ -128,13 +128,14 @@ while (1):
             cX = int(M["m10"]/M["m00"])
             cY = int(M["m01"]/M["m00"])
 
-            #Crop and save ROI
+            #Crop and save ROI (Region of Intrest)
             ROI = original[y:y+h, x:x+w]
             cv2.imwrite('ROI_{}.png'.format(ROI_number),ROI)
             ROI_number += 1
 
             #Draw the contour and center of the shape on the image
-            cv2.rectangle(image,(x,y),(x+w,y+h),(36,255,12),4)
+            #cv2.rectangle(image,(x,y),(x+w,y+h),(36,255,12),4)
+            cv2.circle(image,(cX,cY),int(w/2),(320,159,22),5)
             cv2.circle(image,(cX,cY),10,(320,159,22),-1)
             
             #Find the center of the whole jpg
@@ -143,7 +144,7 @@ while (1):
             centerY = int(imageTuple[0]/2)
             
             #Draw center of circle
-            cv2.circle(image,(centerX,centerY),10,(110,40,100),-1)
+            cv2.circle(image,(centerX,centerY),10,(43,75,238),-1)
             #draw hypotenuse
             cv2.line(image, (cX,cY), (centerX,centerY), (57, 255, 20), 1)
             #draw x line

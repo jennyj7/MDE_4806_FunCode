@@ -20,7 +20,7 @@ GPIO.setup(23, GPIO.OUT)#LED
 
 #socket initialization
 host = '127.0.0.1'
-command = 9999
+command = 9998
 port = int(command)
 socket_size = 1024
 
