@@ -20,7 +20,7 @@ GPIO.setup(23, GPIO.OUT)#LED
 
 #socket initialization
 host = '127.0.0.1'
-command = 9998
+command = 9997
 port = int(command)
 socket_size = 1024
 
@@ -71,14 +71,68 @@ if True: #read_aurduino.decode() == 'Measure':
         print(recieved)
     
     else:
+        
+        aurdinoSendData = ""
+        
         x_val = recieved[0:recieved.find(' ')]
         y_val = recieved[recieved.find(' ') + 1:len(recieved)]
         
-        print("x_val:", x_val)
-        print("y_val:", y_val)
+        x_val = int(x_val)
+        y_val = int(y_val)
         
-        send_StringX = str(x_val)
-        send_StringY = str(y_val)
+        stringX = str(x_val)
+        stringY = str(y_val)
+        
+        #print("x_val:", x_val)
+        #print("y_val:", y_val)
+        
+        #check if x is positive or negative
+        if x_val > 0:
+            aurdinoSendData = aurdinoSendData + "P"
+        else:
+            aurdinoSendData = aurdinoSendData + "N"
+        
+        #input x value into string
+        if abs(x_val) > 999:
+            aurdinoSendData = aurdinoSendData + "999"
+        elif abs(x_val) < 100:
+            if abs(x_val) > 10:
+                aurdinoSendData = aurdinoSendData + "0"
+                aurdinoSendData = aurdinoSendData + str(abs(x_val))
+            else:
+                aurdinoSendData = aurdinoSendData + "00"
+                aurdinoSendData = aurdinoSendData + str(abs(x_val))
+        else:
+            aurdinoSendData = aurdinoSendData + str(abs(x_val))
+            
+        #check if y is positive or negative
+        if y_val > 0:
+            aurdinoSendData = aurdinoSendData + "P"
+        else:
+            aurdinoSendData = aurdinoSendData + "N"
+        
+        #input y value into string
+        if abs(y_val) > 999:
+            aurdinoSendData = aurdinoSendData + "999"
+        elif abs(y_val) < 100:
+            if abs(y_val) > 10:
+                aurdinoSendData = aurdinoSendData + "0"
+                aurdinoSendData = aurdinoSendData + str(abs(y_val))
+            else:
+                aurdinoSendData = aurdinoSendData + "00"
+                aurdinoSendData = aurdinoSendData + str(abs(y_val))
+        else:
+            aurdinoSendData = aurdinoSendData + str(abs(y_val))
+            
+        print("Sent Data:", aurdinoSendData)
+        
+        #get rid of garbage data
+        #ser.flush()
+        
+        #ser.write(send_StringX.encode())
+        #time.sleep(1)
+        #ser.write(send_StringY.encode())
+        
 
 #update command line
 print("--------------------------------------------")
