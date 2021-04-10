@@ -11,7 +11,7 @@ import cv2 as cv2
 
 #Set host and port
 HOST = '127.0.0.1'
-PORT = 9998
+PORT = 9997
 
 #Create Socket
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -19,7 +19,7 @@ s.bind((HOST,PORT))
 s.listen(5)
 
 #initialize camera
-cam = picamera.PiCamera()
+#cam = picamera.PiCamera()
 
 #update command line to show it is waiting for a connection
 print("[Server 01] Waiting for a connection")
@@ -37,13 +37,13 @@ while (1):
     print("[Server 03] Read data: ", command.decode())
     
     #check what the command is
-    if command.decode() == "start":
+    if command.decode()[0:5] == "start":
 
         #Tells camera to take picture and save it as a jpg
         while True:
-
+            
             #name jpg
-            readImage = 'blackDot.jpg'
+            readImage = command.decode()[5:len(command.decode())]
 
             #tell pi to take a picture with the camera
             #cam.capture(readImage)
@@ -155,13 +155,15 @@ while (1):
             #update marked picture
             cv2.imwrite('image.png', image)
             
+            #ask if the correct image is found
+            print("[Server 08] Is this the correct pilot hole? [y/n]")
+            
             #show marked image
             markedImage = cv2.imread('image.png')
             cv2.imshow('image',markedImage)
             
-            #ask for keyboard command
+            #wait for keyboard command
             k = cv2.waitKey(0)
-            print("Is this the correct dot? [y/n]")
             
             if k == ord('y'):
                 xAlign = centerX - cX
@@ -188,6 +190,6 @@ while (1):
             
         
         #update command line
-        print("[Server 08] Sent Information Back to Client")
+        print("[Server 09] Sent Information Back to Client:", contents)
         print("-------------------------------------------")
-        print("[Server 09] Waiting for a new connection")   
+        print("[Server 10] Waiting for a new connection")   
