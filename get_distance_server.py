@@ -192,4 +192,4 @@ while (1):
         #update command line
         print("[Server 09] Sent Information Back to Client:", contents)
         print("-------------------------------------------")
-        print("[Server 10] Waiting for a new connection")   
+        print("[Server 01] Waiting for a new connection")   

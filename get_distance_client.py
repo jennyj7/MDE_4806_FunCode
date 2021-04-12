@@ -121,8 +121,8 @@ while True:
                 aurdinoSendData = aurdinoSendData + "P"
             else:
                 aurdinoSendData = aurdinoSendData + "N"
-            
-        aurdinoSendData = "800P760P"
+        
+        aurdinoSendData = "500N500P"
         print("[Client 06] Sent Data to Aurdino:", aurdinoSendData)
             
         #get rid of garbage data
