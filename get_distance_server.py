@@ -10,8 +10,8 @@ import numpy as np
 import cv2 as cv2
 
 #Set host and port
-HOST = '127.0.0.1'
-PORT = 9997
+HOST = '128.173.94.118'
+PORT = 9990
 
 #Create Socket
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -19,11 +19,10 @@ s.bind((HOST,PORT))
 s.listen(5)
 
 #initialize camera
-#cam = picamera.PiCamera()
+cam = picamera.PiCamera()
 
 #update command line to show it is waiting for a connection
 print("[Server 01] Waiting for a connection")
-
 while (1):
     
     #accept connection
@@ -46,7 +45,7 @@ while (1):
             readImage = command.decode()[5:len(command.decode())]
 
             #tell pi to take a picture with the camera
-            #cam.capture(readImage)
+            cam.capture(readImage)
 
             #update command line that picture has been taken
             print('[Server 04] Picture Taken')
@@ -62,8 +61,12 @@ while (1):
             blur = cv2.GaussianBlur(gray, (3,3), 0)
 
             #Set the threshold values to find black
-            thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
-
+            #thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
+            thresh = cv2.threshold(gray, 50, 255, cv2.THRESH_BINARY_INV)[1]
+            
+            #write threshold picture
+            cv2.imwrite('thresh.png', thresh)
+            
             #Find contours
             ROI_number = 0
             cnts = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -106,7 +109,7 @@ while (1):
                 #Read in image in grey and blur the image
                 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
                 blur = cv2.GaussianBlur(gray, (3,3), 0)
-
+                
                 #Set the threshold values to find black
                 thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
 
@@ -141,8 +144,7 @@ while (1):
             #Find the center of the whole jpg
             imageTuple = image.shape
             centerX = int(imageTuple[1]/2)
-            centerY = int(imageTuple[0]/2)
-            
+            centerY = int(imageTuple[0]/2) 
             #Draw center of circle
             cv2.circle(image,(centerX,centerY),10,(43,75,238),-1)
             #draw hypotenuse
@@ -166,8 +168,8 @@ while (1):
             k = cv2.waitKey(0)
             
             if k == ord('y'):
-                xAlign = centerX - cX
-                yAlign = cY - centerY
+                xAlign = cY - centerY
+                yAlign = cX - centerX
                 cv2.destroyAllWindows()
                     
                 #Send information back to client
@@ -181,14 +183,14 @@ while (1):
                     contents = str(xAlign) + " " + str(yAlign)
                     connection.send(contents.encode())   
                     break
-                                
             elif k == ord('e'):
                 cv2.destroyAllWindows()
-                check = True
+                contents = "Exited"
+                connection.send(contents.encode())
+                break
             else:
                 cv2.destroyAllWindows()
-            
-        
+                    
         #update command line
         print("[Server 09] Sent Information Back to Client:", contents)
         print("-------------------------------------------")
