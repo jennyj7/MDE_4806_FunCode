@@ -10,17 +10,17 @@ import sys
 import serial
 
 #GPIO Basic initialization
-GPIO.setmode(GPIO.BCM)
-GPIO.setwarnings(False)
+#GPIO.setmode(GPIO.BCM)
+#GPIO.setwarnings(False)
 
 #Use a variable for the Pin to use
 #If you followed my pictures, it's port 7 => BCM 4
-GPIO.setup(24, GPIO.IN)#button
-GPIO.setup(23, GPIO.OUT)#LED
+#GPIO.setup(24, GPIO.IN)#button
+#GPIO.setup(23, GPIO.OUT)#LED
 
 #socket initialization
-host = '127.0.0.1'
-command = 9997
+host = '128.173.94.118'
+command = 9990
 port = int(command)
 socket_size = 1024
 
@@ -32,13 +32,14 @@ ser.baudrate = 9600
 print("[Client 01] Waiting for Command from Audrino")
 
 while True:
-        
+    
     #Wait read from audrino
     read_aurdino = ser.readline()
-
+    
+    #print("Aurdino Message:", read_aurdino.decode())
+    
     #Look for "Mesure" command
-    if read_aurdino.decode() == 'Measure':
-
+    if read_aurdino.decode() == 'Measure' or read_aurdino.decode() == 'MeasureMeasure':
         #update the command line
         #print("[Client 02] Message from Audrino:", read_audrino.decode())
                   
@@ -49,7 +50,7 @@ while True:
                 
         #send start and name of jpg to the server
         contents = "start"
-        contents = contents + "blackDot.jpg"
+        contents = contents + "current.jpg"
         sock.send(contents.encode())
         print("[Client 04] Sending to Server:", contents[0:5])
         
@@ -62,10 +63,13 @@ while True:
         sock.close()
         
         if recieved == "Realign":
-            print(recieved)
+            aurdinoSendData = "000P000P"
         
         #if arm is aligned, send 000P000P to the arm
         elif recieved == "Aligned":
+            aurdinoSendData = "000P000P"
+            
+        elif recieved == "Exited":
             aurdinoSendData = "000P000P"
         
         else:
@@ -75,20 +79,20 @@ while True:
             x_val = recieved[0:recieved.find(' ')]
             y_val = recieved[recieved.find(' ') + 1:len(recieved)]
             
-            x_val = int(x_val)
-            y_val = int(y_val)
+            x_val = int(int(x_val)/10) - 10
+            y_val = int(int(y_val)/10) - 50
             
-            stringX = str(x_val)
-            stringY = str(y_val)
-            
-            #print("x_val:", x_val)
-            #print("y_val:", y_val)
+#           #check if tolerance is good
+            if abs(x_val) < 11:
+                x_val = 0
+            if abs(y_val) < 11:
+                y_val = 0
             
             #input x value into string
             if abs(x_val) > 999:
                 aurdinoSendData = aurdinoSendData + "999"
             elif abs(x_val) < 100:
-                if abs(x_val) > 10:
+                if abs(x_val) >= 10:
                     aurdinoSendData = aurdinoSendData + "0"
                     aurdinoSendData = aurdinoSendData + str(abs(x_val))
                 else:
@@ -107,7 +111,7 @@ while True:
             if abs(y_val) > 999:
                 aurdinoSendData = aurdinoSendData + "999"
             elif abs(y_val) < 100:
-                if abs(y_val) > 10:
+                if abs(y_val) >= 10:
                     aurdinoSendData = aurdinoSendData + "0"
                     aurdinoSendData = aurdinoSendData + str(abs(y_val))
                 else:
@@ -122,17 +126,15 @@ while True:
             else:
                 aurdinoSendData = aurdinoSendData + "N"
         
-        aurdinoSendData = "500N500P"
+        #aurdinoSendData = "999P999P"
         print("[Client 06] Sent Data to Aurdino:", aurdinoSendData)
             
         #get rid of garbage data
         ser.flush()
-            
-        ser.write(aurdinoSendData.encode())
-        #time.sleep(1)
-        #ser.write(send_StringY.encode())
-            
-
+        
+        #write to aurdino
+        ser.write(aurdinoSendData.encode())            
+       
         #update command line
         print("--------------------------------------------")
         print("[Client 01] Waiting for Command from Audrino")
